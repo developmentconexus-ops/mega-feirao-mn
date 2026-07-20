@@ -14,11 +14,11 @@ export default function LoginPage() {
     event.preventDefault();
     const user = USERS.find((item) => item.username === username && item.pin === pin);
     if (!user) {
-      setError("PIN incorreto.");
+      setError("Senha incorreta.");
       return;
     }
     localStorage.setItem("mega-feirao-user", JSON.stringify(user));
-    router.push(user.role === "reception" ? "/recepcao" : "/vendedor");
+    router.push(user.role === "seller" ? "/vendedor" : "/recepcao");
   }
 
   return (
@@ -36,8 +36,8 @@ export default function LoginPage() {
             </select>
           </label>
           <label>
-            PIN
-            <input inputMode="numeric" maxLength={4} value={pin} onChange={(event) => { setPin(event.target.value.replace(/\D/g, "")); setError(""); }} placeholder="0000" />
+            Senha
+            <input type="password" autoComplete="current-password" value={pin} onChange={(event) => { setPin(event.target.value); setError(""); }} placeholder="Digite sua senha" />
           </label>
           {error && <p className="error">{error}</p>}
           <button className="primary-button" type="submit">Entrar</button>
