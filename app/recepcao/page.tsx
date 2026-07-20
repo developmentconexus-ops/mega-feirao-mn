@@ -26,7 +26,7 @@ export default function ReceptionPage() {
     const raw = localStorage.getItem("mega-feirao-user");
     if (!raw) return router.replace("/");
     const saved = JSON.parse(raw) as AppUser;
-    if (saved.role !== "reception") return router.replace("/");
+    if (saved.role !== "reception" && saved.role !== "viewer") return router.replace("/");
     void load();
     const timer = window.setInterval(() => void load(), 1000);
     return () => window.clearInterval(timer);
