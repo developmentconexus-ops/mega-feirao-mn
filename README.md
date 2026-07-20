@@ -2,54 +2,63 @@
 
 Aplicativo interno para organizar a fila de vendedores durante o Mega Feirão Metal Nobre.
 
-## Funcionamento
+## Implantação recomendada: um único EXE
 
-- O vendedor entra com usuário e PIN.
-- Ao ficar disponível, entra no fim da fila.
-- Ao iniciar atendimento, sai da fila e fica vermelho.
-- A recepção vê o próximo vendedor, a fila completa e quem está atendendo.
-- As telas atualizam automaticamente a cada segundo.
+O projeto é um servidor Go com todo o frontend embutido. O servidor da empresa **não precisa de Node.js, npm, banco de dados, Docker ou Go instalado**.
 
-## Usuários iniciais
+### Baixar o executável
 
-Os vendedores estão cadastrados como `vendedor1` até `vendedor8`, com PINs `1111` até `8888`.
+1. Abra o repositório no GitHub.
+2. Entre em **Actions**.
+3. Abra a execução mais recente de **Build Windows EXE**.
+4. Em **Artifacts**, baixe `mega-feirao-windows`.
+5. Extraia `mega-feirao.exe` para `C:\Mega-Feirao` no servidor.
 
-A recepção usa:
+### Executar
+
+Dê dois cliques em:
 
 ```text
-Usuário: recepcao
-PIN: 9999
+C:\Mega-Feirao\mega-feirao.exe
 ```
 
-Para trocar nomes, usuários ou PINs, edite apenas `lib/config.ts`.
-
-## Executar no servidor
-
-Requisito: Node.js 20 ou superior.
-
-```bash
-git clone https://github.com/developmentconexus-ops/mega-feirao-mn.git
-cd mega-feirao-mn
-npm install
-npm run build
-npm start
-```
-
-O aplicativo ficará acessível em:
+O aplicativo ficará disponível em:
 
 ```text
 http://192.168.0.3:3000
 ```
 
-O servidor e os celulares precisam estar na mesma rede. Libere a porta TCP `3000` no firewall do servidor.
+Na primeira execução, o programa cria automaticamente:
+
+```text
+C:\Mega-Feirao\data\state.json
+```
+
+Esse arquivo guarda a fila atual. Para zerar todos os vendedores como “em atendimento”, feche o programa e exclua `data\state.json`.
+
+### Firewall do Windows
+
+Libere uma regra de entrada TCP para a porta `3000`. Todos os celulares precisam estar na mesma rede local do servidor.
 
 ## Desenvolvimento
 
+Requer Go 1.23 ou superior somente na máquina de desenvolvimento:
+
 ```bash
-npm install
-npm run dev
+go test ./...
+go run .
 ```
 
-## Persistência
+Build manual para Windows:
 
-O estado da fila fica em `data/state.json`. Todos começam como **Em atendimento**, e entram voluntariamente na fila ao tocar em **Finalizar e ficar disponível**.
+```bash
+GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o dist/mega-feirao.exe .
+```
+
+## Usuários
+
+Os usuários e senhas estão em `config.go`. Há três papéis:
+
+- `seller`: altera o próprio status.
+- `reception`: visualiza a fila da recepção.
+- `viewer`: visualiza a mesma tela em modo somente leitura.
