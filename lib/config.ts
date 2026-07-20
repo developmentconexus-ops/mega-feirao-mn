@@ -1,4 +1,4 @@
-export type UserRole = "seller" | "reception";
+export type UserRole = "seller" | "reception" | "viewer";
 
 export type AppUser = {
   username: string;
@@ -7,15 +7,24 @@ export type AppUser = {
   role: UserRole;
 };
 
-// Edite apenas esta lista para trocar os nomes, usuários e PINs.
+// Edite apenas esta lista para trocar os nomes, usuários e senhas.
 export const USERS: AppUser[] = [
-  { username: "vendedor1", name: "Vendedor 1", pin: "1111", role: "seller" },
-  { username: "vendedor2", name: "Vendedor 2", pin: "2222", role: "seller" },
-  { username: "vendedor3", name: "Vendedor 3", pin: "3333", role: "seller" },
-  { username: "vendedor4", name: "Vendedor 4", pin: "4444", role: "seller" },
-  { username: "vendedor5", name: "Vendedor 5", pin: "5555", role: "seller" },
-  { username: "vendedor6", name: "Vendedor 6", pin: "6666", role: "seller" },
-  { username: "vendedor7", name: "Vendedor 7", pin: "7777", role: "seller" },
-  { username: "vendedor8", name: "Vendedor 8", pin: "8888", role: "seller" },
-  { username: "recepcao", name: "Recepção", pin: "9999", role: "reception" }
+  { username: "oscar", name: "Oscar", pin: "oscarMN", role: "seller" },
+  { username: "francyelle", name: "Francyelle", pin: "franMN", role: "seller" },
+  { username: "keila", name: "Keila", pin: "keilaMN", role: "seller" },
+  { username: "beatriz", name: "Beatriz", pin: "beatrizMN", role: "seller" },
+  { username: "raphael", name: "Raphael", pin: "raphaelMN", role: "seller" },
+  { username: "joao", name: "João", pin: "joaoMN", role: "seller" },
+  { username: "jose", name: "Jose", pin: "joseMN", role: "seller" },
+  { username: "daniel", name: "Daniel", pin: "danielMN", role: "seller" },
+  { username: "leandro", name: "Leandro", pin: "leandroMN", role: "seller" },
+  { username: "izabel", name: "Izabel", pin: "izabelMN", role: "seller" },
+
+  { username: "thassya", name: "Thassya", pin: "thassyaMN", role: "reception" },
+  { username: "sthella", name: "Sthella", pin: "SthellaMN", role: "reception" },
+
+  { username: "leandrot", name: "Leandro T", pin: "leandrotMN", role: "viewer" },
+  { username: "viniciust", name: "Vinicius T", pin: "viniciustMN", role: "viewer" },
+  { username: "mauro", name: "Mauro", pin: "mauroMN", role: "viewer" },
+  { username: "vinicius", name: "Vinicius", pin: "viniciusMN", role: "viewer" }
 ];
