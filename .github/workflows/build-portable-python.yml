@@ -1,0 +1,68 @@
+name: Build Portable Python
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - app.py
+      - portable/**
+      - .github/workflows/build-portable-python.yml
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download official embedded Python
+        shell: pwsh
+        run: |
+          $url = 'https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip'
+          Invoke-WebRequest -Uri $url -OutFile python-embed.zip
+          New-Item -ItemType Directory -Force -Path dist\Mega-Feirao-Portable\python | Out-Null
+          Expand-Archive -Path python-embed.zip -DestinationPath dist\Mega-Feirao-Portable\python
+
+      - name: Assemble portable application
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist\Mega-Feirao-Portable\projeto | Out-Null
+          Copy-Item app.py dist\Mega-Feirao-Portable\projeto\app.py
+          Copy-Item 'portable\Iniciar Mega Feirao.bat' 'dist\Mega-Feirao-Portable\Iniciar Mega Feirao.bat'
+          Copy-Item 'portable\Iniciar Mega Feirao Oculto.ps1' 'dist\Mega-Feirao-Portable\Iniciar Mega Feirao Oculto.ps1'
+          Copy-Item 'portable\Parar Mega Feirao.ps1' 'dist\Mega-Feirao-Portable\Parar Mega Feirao.ps1'
+          @'
+          Mega Feirão Metal Nobre - versão portátil
+
+          1. Extraia a pasta inteira no servidor.
+          2. Execute "Iniciar Mega Feirao.bat" para visualizar os logs.
+          3. Ou execute "Iniciar Mega Feirao Oculto.ps1" pelo PowerShell.
+          4. Acesse http://192.168.0.3:3000.
+
+          Não mova apenas o app.py. As pastas python e projeto devem permanecer juntas.
+          '@ | Set-Content 'dist\Mega-Feirao-Portable\LEIA-ME.txt' -Encoding UTF8
+
+      - name: Verify portable Python starts the application
+        shell: pwsh
+        run: |
+          $root = Resolve-Path 'dist\Mega-Feirao-Portable'
+          $process = Start-Process -FilePath "$root\python\python.exe" -ArgumentList 'app.py' -WorkingDirectory "$root\projeto" -PassThru -WindowStyle Hidden
+          try {
+            Start-Sleep -Seconds 2
+            $response = Invoke-WebRequest -Uri 'http://127.0.0.1:3000' -UseBasicParsing
+            if ($response.StatusCode -ne 200) { throw "HTTP inesperado: $($response.StatusCode)" }
+          } finally {
+            Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+          }
+
+      - name: Upload portable package
+        uses: actions/upload-artifact@v4
+        with:
+          name: mega-feirao-python-portable
+          path: dist/Mega-Feirao-Portable
+          if-no-files-found: error
+          retention-days: 30
