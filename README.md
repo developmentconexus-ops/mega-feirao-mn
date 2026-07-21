@@ -2,24 +2,38 @@
 
 Aplicativo interno para organizar a fila de vendedores durante o Mega Feirão Metal Nobre.
 
-## Implantação recomendada: um único EXE
+## Implantação recomendada: Python
 
-O projeto é um servidor Go com todo o frontend embutido. O servidor da empresa **não precisa de Node.js, npm, banco de dados, Docker ou Go instalado**.
+O servidor da empresa precisa apenas do Python que já está instalado. Não é necessário instalar Node.js, npm, Go, Docker, banco de dados ou bibliotecas pelo `pip`.
 
-### Baixar o executável
-
-1. Abra o repositório no GitHub.
-2. Entre em **Actions**.
-3. Abra a execução mais recente de **Build Windows EXE**.
-4. Em **Artifacts**, baixe `mega-feirao-windows`.
-5. Extraia `mega-feirao.exe` para `C:\Mega-Feirao` no servidor.
-
-### Executar
-
-Dê dois cliques em:
+Toda a aplicação está no arquivo:
 
 ```text
-C:\Mega-Feirao\mega-feirao.exe
+app.py
+```
+
+Ele contém o servidor, a interface, os usuários e a lógica da fila.
+
+## Instalar no servidor
+
+1. Baixe o repositório como ZIP pelo GitHub.
+2. Extraia para:
+
+```text
+C:\Mega-Feirao
+```
+
+3. Abra o Prompt de Comando nessa pasta.
+4. Execute:
+
+```powershell
+python app.py
+```
+
+Caso o comando `python` não funcione, tente:
+
+```powershell
+py app.py
 ```
 
 O aplicativo ficará disponível em:
@@ -28,37 +42,44 @@ O aplicativo ficará disponível em:
 http://192.168.0.3:3000
 ```
 
+No próprio servidor, também pode ser testado em:
+
+```text
+http://localhost:3000
+```
+
+## Firewall do Windows
+
+Abra o PowerShell como administrador e execute:
+
+```powershell
+New-NetFirewallRule -DisplayName "Mega Feirao Metal Nobre" -Direction Inbound -Protocol TCP -LocalPort 3000 -Action Allow
+```
+
+Todos os celulares precisam estar conectados à mesma rede local do servidor.
+
+## Persistência
+
 Na primeira execução, o programa cria automaticamente:
 
 ```text
 C:\Mega-Feirao\data\state.json
 ```
 
-Esse arquivo guarda a fila atual. Para zerar todos os vendedores como “em atendimento”, feche o programa e exclua `data\state.json`.
+Esse arquivo guarda a fila atual. Para zerar a fila:
 
-### Firewall do Windows
-
-Libere uma regra de entrada TCP para a porta `3000`. Todos os celulares precisam estar na mesma rede local do servidor.
-
-## Desenvolvimento
-
-Requer Go 1.23 ou superior somente na máquina de desenvolvimento:
-
-```bash
-go test ./...
-go run .
-```
-
-Build manual para Windows:
-
-```bash
-GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o dist/mega-feirao.exe .
-```
+1. Encerre o programa com `Ctrl+C`.
+2. Exclua `data\state.json`.
+3. Execute `python app.py` novamente.
 
 ## Usuários
 
-Os usuários e senhas estão em `config.go`. Há três papéis:
+Os usuários e senhas estão no início de `app.py`. Há três papéis:
 
-- `seller`: altera o próprio status.
-- `reception`: visualiza a fila da recepção.
-- `viewer`: visualiza a mesma tela em modo somente leitura.
+- `seller`: vendedor que altera o próprio status.
+- `reception`: acesso à tela da recepção.
+- `viewer`: acesso somente para visualização.
+
+## Versão em Go
+
+Os arquivos da versão em Go permanecem no repositório apenas como alternativa. Para o servidor da empresa, utilize `app.py`, pois o Python já é autorizado no ambiente.
