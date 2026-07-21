@@ -2,47 +2,76 @@
 
 Aplicativo interno para organizar a fila de vendedores durante o Mega Feirão Metal Nobre.
 
-## Implantação recomendada: Python
+## Implantação recomendada: Python portátil
 
-O servidor da empresa precisa apenas do Python que já está instalado. Não é necessário instalar Node.js, npm, Go, Docker, banco de dados ou bibliotecas pelo `pip`.
+O servidor da empresa **não precisa ter Python instalado**. O pacote inclui o Python oficial embutível para Windows dentro da própria pasta do aplicativo. Também não é necessário instalar Node.js, npm, Go, Docker, banco de dados ou bibliotecas pelo `pip`.
 
-Toda a aplicação está no arquivo:
-
-```text
-app.py
-```
-
-Ele contém o servidor, a interface, os usuários e a lógica da fila.
-
-## Instalar no servidor
-
-1. Baixe o repositório como ZIP pelo GitHub.
-2. Extraia para:
+Estrutura do pacote:
 
 ```text
-C:\Mega-Feirao
+Mega-Feirao-Portable\
+├── python\
+│   └── python.exe
+├── projeto\
+│   └── app.py
+├── Iniciar Mega Feirao.bat
+├── Iniciar Mega Feirao Oculto.ps1
+└── Parar Mega Feirao.ps1
 ```
 
-3. Abra o Prompt de Comando nessa pasta.
-4. Execute:
+## Baixar o pacote pronto
+
+1. Abra a aba **Actions** do repositório.
+2. Abra a execução mais recente de **Build Portable Python**.
+3. Em **Artifacts**, baixe `mega-feirao-python-portable`.
+4. Extraia a pasta inteira para o servidor, por exemplo:
+
+```text
+C:\Mega-Feirao-Portable
+```
+
+Não copie apenas o `app.py`; as pastas `python` e `projeto` devem permanecer juntas.
+
+## Iniciar com a janela visível
+
+Dê dois cliques em:
+
+```text
+C:\Mega-Feirao-Portable\Iniciar Mega Feirao.bat
+```
+
+Esse modo mostra os logs e permite encerrar com `Ctrl+C`.
+
+## Iniciar oculto
+
+No PowerShell:
 
 ```powershell
-python app.py
+& "C:\Mega-Feirao-Portable\Iniciar Mega Feirao Oculto.ps1"
 ```
 
-Caso o comando `python` não funcione, tente:
+O comando executado internamente é equivalente a:
 
 ```powershell
-py app.py
+Start-Process -FilePath "C:\Mega-Feirao-Portable\python\python.exe" `
+  -ArgumentList "app.py" `
+  -WorkingDirectory "C:\Mega-Feirao-Portable\projeto" `
+  -WindowStyle Hidden
 ```
 
-O aplicativo ficará disponível em:
+Para encerrar a instância iniciada de forma oculta:
+
+```powershell
+& "C:\Mega-Feirao-Portable\Parar Mega Feirao.ps1"
+```
+
+## Acesso
 
 ```text
 http://192.168.0.3:3000
 ```
 
-No próprio servidor, também pode ser testado em:
+No próprio servidor:
 
 ```text
 http://localhost:3000
@@ -50,7 +79,7 @@ http://localhost:3000
 
 ## Firewall do Windows
 
-Abra o PowerShell como administrador e execute:
+Abra o PowerShell como administrador e execute uma única vez:
 
 ```powershell
 New-NetFirewallRule -DisplayName "Mega Feirao Metal Nobre" -Direction Inbound -Protocol TCP -LocalPort 3000 -Action Allow
@@ -63,14 +92,10 @@ Todos os celulares precisam estar conectados à mesma rede local do servidor.
 Na primeira execução, o programa cria automaticamente:
 
 ```text
-C:\Mega-Feirao\data\state.json
+C:\Mega-Feirao-Portable\projeto\data\state.json
 ```
 
-Esse arquivo guarda a fila atual. Para zerar a fila:
-
-1. Encerre o programa com `Ctrl+C`.
-2. Exclua `data\state.json`.
-3. Execute `python app.py` novamente.
+Esse arquivo guarda a fila atual. Para zerar a fila, pare o programa, exclua `projeto\data\state.json` e inicie novamente.
 
 ## Usuários
 
@@ -79,7 +104,3 @@ Os usuários e senhas estão no início de `app.py`. Há três papéis:
 - `seller`: vendedor que altera o próprio status.
 - `reception`: acesso à tela da recepção.
 - `viewer`: acesso somente para visualização.
-
-## Versão em Go
-
-Os arquivos da versão em Go permanecem no repositório apenas como alternativa. Para o servidor da empresa, utilize `app.py`, pois o Python já é autorizado no ambiente.
